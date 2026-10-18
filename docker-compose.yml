@@ -1,0 +1,136 @@
+services:
+  mongo:
+    image: mongo:6
+    restart: unless-stopped
+    container_name: mongo
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo-data:/data/db
+    healthcheck:
+      test: ["CMD", "mongosh", "--eval", "db.adminCommand('ping')"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+      start_period: 5s
+    networks:
+      - ecommerce-network
+
+  nginx:
+    image: nginx:alpine
+    restart: unless-stopped
+    container_name: nginx
+    ports:
+      - "80:80"
+    volumes:
+      - type: bind
+        source: ./nginx/nginx.conf
+        target: /etc/nginx/conf.d/default.conf
+        read_only: true
+        bind:
+          create_host_path: false
+    depends_on:
+      - frontend
+      - user-service
+      - product-service
+      - order-service
+      - cart-service
+    networks:
+      - ecommerce-network
+
+  frontend:
+    build:
+      context: .
+      dockerfile: frontend/Dockerfile
+    image: ecomm-frontend:latest
+    container_name: ecommfrontend
+    ports:
+      - "3000:3000"
+    depends_on:
+      - mongo
+      - user-service
+      - product-service
+      - order-service
+      - cart-service
+    networks:
+      - ecommerce-network
+
+  user-service:
+    build:
+      context: .
+      dockerfile: backend/user-service/Dockerfile
+    image: ecomm-user-service:latest
+    container_name: ecommuser-service
+    ports:
+      - "3001:3001"
+    environment:
+      - MONGODB_URI=mongodb://mongo:27017/ecommerce
+      - JWT_SECRET=your-jwt-secret-key
+      - PORT=3001
+    depends_on:
+      mongo:
+        condition: service_healthy
+    networks:
+      - ecommerce-network
+
+  product-service:
+    build:
+      context: .
+      dockerfile: backend/product-service/Dockerfile
+    image: ecomm-product-service:latest
+    container_name: ecommproduct-service
+    ports:
+      - "3002:3002"
+    environment:
+      - MONGODB_URI=mongodb://mongo:27017/ecommerce
+      - PORT=3002
+    depends_on:
+      mongo:
+        condition: service_healthy
+    networks:
+      - ecommerce-network
+
+  order-service:
+    build:
+      context: .
+      dockerfile: backend/order-service/Dockerfile
+    image: ecomm-order-service:latest
+    container_name: ecommorder-service
+    ports:
+      - "3004:3004"
+    environment:
+      - MONGODB_URI=mongodb://mongo:27017/ecommerce
+      - PORT=3004
+      - CART_SERVICE_URL=http://cart-service:3003
+      - PRODUCT_SERVICE_URL=http://product-service:3002
+      - USER_SERVICE_URL=http://user-service:3001
+    depends_on:
+      mongo:
+        condition: service_healthy
+    networks:
+      - ecommerce-network
+
+  cart-service:
+    build:
+      context: .
+      dockerfile: backend/cart-service/Dockerfile
+    image: ecomm-cart-service:latest
+    container_name: ecommcart-service
+    ports:
+      - "3003:3003"
+    environment:
+      - MONGODB_URI=mongodb://mongo:27017/ecommerce
+      - PORT=3003
+      - PRODUCT_SERVICE_URL=http://product-service:3002
+    depends_on:
+      mongo:
+        condition: service_healthy
+    networks:
+      - ecommerce-network
+      
+volumes:
+  mongo-data:
+
+networks:
+  ecommerce-network:
+    name: ecommerce-network
