@@ -187,6 +187,32 @@ docker run -d -p 3004:3004 <dockerhub-username>/payment-service:latest
 
 > https://github.com/Harika130822/HV_SkillTest3_Terraform/blob/main/terraform/Readme.md
 
+```
+terraform/
+├── .terraform/
+│   └── providers/
+│       └── registry.terraform.io/
+│           └── hashicorp/
+│               └── aws/
+│                   └── 5.100.0/
+│                       └── windows_amd64/
+│                           ├── LICENSE.txt
+│                           └── terraform-provider-aws_v5.100.0_x5.exe
+├── .terraform.lock.hcl
+├── data.tf
+├── main.tf
+├── my-key.pub
+├── outputs.tf
+├── provider.tf
+├── terraform.tfstate
+├── terraform.tfstate.backup
+├── terraform.tfvars
+├── user_data.sh copy.tpl
+├── user_data.sh.tpl
+├── variables.tf
+└── versions.tf
+```
+
 ---
 
 ## 3. Deployment and Accessibility (25 Marks)
@@ -279,5 +305,3 @@ http://xx.xx.xx.xx:3000
 ---
 
 
-
-Successfully deployed a multi-service Node.js e-commerce application using Docker and Terraform on AWS. The infrastructure, networking, Docker installation, image deployment, and service accessibility were fully automated through Terraform and EC2 User Data scripts, ensuring a reproducible and scalable deployment process.
