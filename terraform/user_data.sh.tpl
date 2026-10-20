@@ -81,6 +81,22 @@ server {
         return 404;
     }
 
+    location = /svc/user/health {
+        proxy_pass http://127.0.0.1:3001/health;
+    }
+
+    location = /svc/product/health {
+        proxy_pass http://127.0.0.1:3002/health;
+    }
+
+    location = /svc/cart/health {
+        proxy_pass http://127.0.0.1:3003/health;
+    }
+
+    location = /svc/order/health {
+        proxy_pass http://127.0.0.1:3004/health;
+    }
+
     location / {
         proxy_pass http://127.0.0.1:3000;
         proxy_set_header Host $host;
@@ -100,41 +116,34 @@ systemctl reload nginx
 # Shared network: containers reach each other by name
 docker network create ecom || true
 
-# Database
-docker run -d --name mongo --restart always --network ecom \
-  -v mongo-data:/data/db mongo:6.0
-
-# Wait until MongoDB accepts connections before starting the services
-until docker exec mongo mongosh --quiet --eval "db.adminCommand('ping')" >/dev/null 2>&1; do sleep 3; done
-
 # Backend services
 docker run -d --name user-service --restart always --network ecom \
   -p 127.0.0.1:3001:3001 \
-  -e PORT=3001 -e MONGODB_URI=mongodb://mongo:27017/ecommerce_users -e JWT_SECRET='${jwt_secret}' \
-  ${dockerhub_username}/ecom-user-service:${image_tag}
+  -e PORT=3001 -e MONGODB_URI='${mongodb_url_up}' -e JWT_SECRET='${jwt_secret}' \
+  ${dockerhub_username}/ecomm-user-service:${image_tag}
 
 docker run -d --name product-service --restart always --network ecom \
   -p 127.0.0.1:3002:3002 \
-  -e PORT=3002 -e MONGODB_URI=mongodb://mongo:27017/ecommerce_products \
-  ${dockerhub_username}/ecom-product-service:${image_tag}
+  -e PORT=3002 -e MONGODB_URI='${mongodb_url_up}' \
+  ${dockerhub_username}/ecomm-product-service:${image_tag}
 
 docker run -d --name cart-service --restart always --network ecom \
   -p 127.0.0.1:3003:3003 \
-  -e PORT=3003 -e MONGODB_URI=mongodb://mongo:27017/ecommerce_carts \
+  -e PORT=3003 -e MONGODB_URI='${mongodb_url_up}' \
   -e PRODUCT_SERVICE_URL=http://product-service:3002 \
-  ${dockerhub_username}/ecom-cart-service:${image_tag}
+  ${dockerhub_username}/ecomm-cart-service:${image_tag}
 
 docker run -d --name order-service --restart always --network ecom \
   -p 127.0.0.1:3004:3004 \
-  -e PORT=3004 -e MONGODB_URI=mongodb://mongo:27017/ecommerce_orders \
+  -e PORT=3004 -e MONGODB_URI='${mongodb_url_up}' \
   -e CART_SERVICE_URL=http://cart-service:3003 \
   -e PRODUCT_SERVICE_URL=http://product-service:3002 \
   -e USER_SERVICE_URL=http://user-service:3001 \
-  ${dockerhub_username}/ecom-order-service:${image_tag}
+  ${dockerhub_username}/ecomm-order-service:${image_tag}
 
 # Frontend is reachable only through the host Nginx reverse proxy
 docker run -d --name frontend --restart always --network ecom \
   -p 127.0.0.1:3000:3000 \
-  ${dockerhub_username}/ecom-frontend:${image_tag}
+  ${dockerhub_username}/ecomm-frontend:${image_tag}
 
 docker ps
