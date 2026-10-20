@@ -29,7 +29,7 @@ Success! The configuration is valid.
 
 PS C:\Users\abhis\Harika\skilltest\E-CommerceStore\terraform> terraform plan
 ..............
-Plan: 12 to add, 0 to change, 0 to destroy.
+Plan: 13 to add, 0 to change, 0 to destroy.
 
 Changes to Outputs:
   + frontend_url      = (known after apply)
@@ -50,19 +50,20 @@ you run "terraform apply" now.
 
 terraform apply
 ........
-Apply complete! Resources: 12 added, 0 changed, 0 destroyed.
+
+Apply complete! Resources: 13 added, 0 changed, 0 destroyed.
 
 Outputs:
 
-frontend_url = "http://13.232.85.77"
+frontend_url = "http://13.232.20.39"
 health_check_urls = {
-  "cart" = "http://13.232.85.77/svc/cart/health"
-  "order" = "http://13.232.85.77/svc/order/health"
-  "product" = "http://13.232.85.77/svc/product/health"
-  "user" = "http://13.232.85.77/svc/user/health"
+  "cart" = "http://13.232.20.39/svc/cart/health"
+  "order" = "http://13.232.20.39/svc/order/health"
+  "product" = "http://13.232.20.39/svc/product/health"
+  "user" = "http://13.232.20.39/svc/user/health"
 }
-public_dns = "ec2-13-232-85-77.ap-south-1.compute.amazonaws.com"
-public_ip = "13.232.85.77"
+public_dns = "ec2-13-232-20-39.ap-south-1.compute.amazonaws.com"
+public_ip = "13.232.20.39"
 
 
 terraform destroy
