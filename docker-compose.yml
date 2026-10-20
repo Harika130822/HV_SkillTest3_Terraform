@@ -1,20 +1,4 @@
 services:
-  mongo:
-    image: mongo:6
-    restart: unless-stopped
-    container_name: mongo
-    ports:
-      - "27017:27017"
-    volumes:
-      - mongo-data:/data/db
-    healthcheck:
-      test: ["CMD", "mongosh", "--eval", "db.adminCommand('ping')"]
-      interval: 5s
-      timeout: 3s
-      retries: 5
-      start_period: 5s
-    networks:
-      - ecommerce-network
 
   nginx:
     image: nginx:alpine
@@ -47,7 +31,6 @@ services:
     ports:
       - "3000:3000"
     depends_on:
-      - mongo
       - user-service
       - product-service
       - order-service
@@ -64,12 +47,9 @@ services:
     ports:
       - "3001:3001"
     environment:
-      - MONGODB_URI=mongodb://mongo:27017/ecommerce
+      - MONGODB_URI=mongodb+srv://<username>:<Pwsd>@herovired-ppmcad.kncn7uu.mongodb.net/ecommerce?retryWrites=true&w=majority
       - JWT_SECRET=your-jwt-secret-key
       - PORT=3001
-    depends_on:
-      mongo:
-        condition: service_healthy
     networks:
       - ecommerce-network
 
@@ -82,11 +62,8 @@ services:
     ports:
       - "3002:3002"
     environment:
-      - MONGODB_URI=mongodb://mongo:27017/ecommerce
+      - MONGODB_URI=mongodb+srv://<username>:<Pwsd>@herovired-ppmcad.kncn7uu.mongodb.net/ecommerce?retryWrites=true&w=majority
       - PORT=3002
-    depends_on:
-      mongo:
-        condition: service_healthy
     networks:
       - ecommerce-network
 
@@ -99,14 +76,11 @@ services:
     ports:
       - "3004:3004"
     environment:
-      - MONGODB_URI=mongodb://mongo:27017/ecommerce
+      - MONGODB_URI=mongodb+srv://<username>:<Pwsd>@herovired-ppmcad.kncn7uu.mongodb.net/ecommerce?retryWrites=true&w=majority
       - PORT=3004
       - CART_SERVICE_URL=http://cart-service:3003
       - PRODUCT_SERVICE_URL=http://product-service:3002
       - USER_SERVICE_URL=http://user-service:3001
-    depends_on:
-      mongo:
-        condition: service_healthy
     networks:
       - ecommerce-network
 
@@ -119,12 +93,9 @@ services:
     ports:
       - "3003:3003"
     environment:
-      - MONGODB_URI=mongodb://mongo:27017/ecommerce
+      - MONGODB_URI=mongodb+srv://<username>:<Pwsd>@herovired-ppmcad.kncn7uu.mongodb.net/ecommerce?retryWrites=true&w=majority
       - PORT=3003
       - PRODUCT_SERVICE_URL=http://product-service:3002
-    depends_on:
-      mongo:
-        condition: service_healthy
     networks:
       - ecommerce-network
       
