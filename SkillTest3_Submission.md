@@ -63,6 +63,8 @@ docker run -d -p 3003:3003 order-service
 docker run -d -p 3004:3004 payment-service
 ```
 
+> <img width="1269" height="457" alt="image" src="https://github.com/user-attachments/assets/80428202-8cc7-453a-82a6-32ff8947382a" />
+
 Validation:
 
 ```bash
@@ -83,6 +85,9 @@ docker tag order-service <dockerhub-username>/order-service:latest
 docker tag payment-service <dockerhub-username>/payment-service:latest
 ```
 
+> <img width="1305" height="191" alt="image" src="https://github.com/user-attachments/assets/eaf4f832-abf4-4355-8e24-910f8c16ef1b" />
+
+
 #### Step 5: Push Images to Docker Hub
 
 ```bash
@@ -92,6 +97,10 @@ docker push <dockerhub-username>/product-service:latest
 docker push <dockerhub-username>/order-service:latest
 docker push <dockerhub-username>/payment-service:latest
 ```
+
+### Reference link with detailed steps
+
+https://github.com/Harika130822/HV_SkillTest3_Terraform/blob/main/LocalDockerSetup/Readme.md
 
 ---
 
@@ -174,6 +183,10 @@ docker run -d -p 3003:3003 <dockerhub-username>/order-service:latest
 docker run -d -p 3004:3004 <dockerhub-username>/payment-service:latest
 ```
 
+#### Reference Link with detailed steps
+
+> https://github.com/Harika130822/HV_SkillTest3_Terraform/blob/main/terraform/Readme.md
+
 ---
 
 ## 3. Deployment and Accessibility (25 Marks)
@@ -220,6 +233,7 @@ http://<EC2-Public-IP>:3002
 http://<EC2-Public-IP>:3003
 http://<EC2-Public-IP>:3004
 ```
+> <img width="963" height="850" alt="image" src="https://github.com/user-attachments/assets/5a8baf45-87e4-47ea-93a3-1ae052cc47a8" />
 
 ### Terraform Outputs
 
@@ -245,6 +259,8 @@ Application Access:
 http://xx.xx.xx.xx:3000
 ```
 
+> <img width="881" height="565" alt="image" src="https://github.com/user-attachments/assets/8c155026-bab4-4301-b9ee-f4241bfd9b98" />
+
 ---
 
 ## Project Deliverables
@@ -262,6 +278,6 @@ http://xx.xx.xx.xx:3000
 
 ---
 
-## Conclusion
+
 
 Successfully deployed a multi-service Node.js e-commerce application using Docker and Terraform on AWS. The infrastructure, networking, Docker installation, image deployment, and service accessibility were fully automated through Terraform and EC2 User Data scripts, ensuring a reproducible and scalable deployment process.
