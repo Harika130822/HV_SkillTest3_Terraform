@@ -1,0 +1,267 @@
+# Deploy a Multi-Service Node.js E-commerce Application Using Terraform and Docker
+
+## 1. Application Setup (Manual - Not Terraform)
+
+This section covers the manual setup of the application services before infrastructure provisioning.
+
+### Objective
+
+Create, containerize, and publish five independent services using Docker.
+
+### Services
+
+| Service Name | Port |
+|-------------|------|
+| Frontend Service | 3000 |
+| User Service | 3001 |
+| Product Service | 3002 |
+| Order Service | 3003 |
+| Payment Service | 3004 |
+
+### Tasks Performed
+
+#### Step 1: Create Dockerfiles
+
+Created separate Dockerfiles for all five services.
+
+Each service:
+
+- Exposes a dedicated port.
+- Returns a sample response confirming the service status.
+
+Example Response:
+
+```text
+Frontend Service Running
+User Service Running
+Product Service Running
+Order Service Running
+Payment Service Running
+```
+
+#### Step 2: Build Docker Images
+
+Commands used:
+
+```bash
+docker build -t frontend-service .
+docker build -t user-service .
+docker build -t product-service .
+docker build -t order-service .
+docker build -t payment-service .
+```
+
+#### Step 3: Test Docker Images Locally
+
+Example:
+
+```bash
+docker run -d -p 3000:3000 frontend-service
+docker run -d -p 3001:3001 user-service
+docker run -d -p 3002:3002 product-service
+docker run -d -p 3003:3003 order-service
+docker run -d -p 3004:3004 payment-service
+```
+
+Validation:
+
+```bash
+curl http://localhost:3000
+curl http://localhost:3001
+curl http://localhost:3002
+curl http://localhost:3003
+curl http://localhost:3004
+```
+
+#### Step 4: Tag Docker Images
+
+```bash
+docker tag frontend-service <dockerhub-username>/frontend-service:latest
+docker tag user-service <dockerhub-username>/user-service:latest
+docker tag product-service <dockerhub-username>/product-service:latest
+docker tag order-service <dockerhub-username>/order-service:latest
+docker tag payment-service <dockerhub-username>/payment-service:latest
+```
+
+#### Step 5: Push Images to Docker Hub
+
+```bash
+docker push <dockerhub-username>/frontend-service:latest
+docker push <dockerhub-username>/user-service:latest
+docker push <dockerhub-username>/product-service:latest
+docker push <dockerhub-username>/order-service:latest
+docker push <dockerhub-username>/payment-service:latest
+```
+
+---
+
+## 2. Infrastructure Provisioning with Terraform (25 Marks)
+
+### Objective
+
+Provision AWS infrastructure using Terraform to host and run the containerized services.
+
+### Resources Created
+
+#### VPC
+
+- Custom VPC created using Terraform.
+- CIDR Block: `10.0.0.0/16`
+
+#### Public Subnet
+
+- Public subnet created within the VPC.
+- Auto-assigned public IP enabled.
+
+#### Internet Gateway
+
+- Attached to the VPC for internet access.
+
+#### Route Table
+
+- Configured routes for public internet connectivity.
+
+#### EC2 Instance
+
+- Amazon Linux 2 EC2 instance provisioned.
+- Used as the Docker host for all application containers.
+
+#### Security Group Configuration
+
+Allowed inbound traffic:
+
+| Port | Purpose |
+|--------|----------|
+| 22 | SSH Access |
+| 3000 | Frontend Service |
+| 3001 | User Service |
+| 3002 | Product Service |
+| 3003 | Order Service |
+| 3004 | Payment Service |
+
+Internal container-to-container communication was enabled through the security group configuration.
+
+### Terraform User Data Script
+
+The EC2 instance uses a User Data script to automate deployment.
+
+Tasks executed during instance launch:
+
+1. Install Docker.
+2. Start Docker service.
+3. Pull all Docker images from Docker Hub.
+4. Create and run all containers.
+5. Map service ports correctly.
+
+Example User Data Operations:
+
+```bash
+sudo yum update -y
+sudo yum install docker -y
+sudo systemctl start docker
+sudo systemctl enable docker
+
+docker pull <dockerhub-username>/frontend-service:latest
+docker pull <dockerhub-username>/user-service:latest
+docker pull <dockerhub-username>/product-service:latest
+docker pull <dockerhub-username>/order-service:latest
+docker pull <dockerhub-username>/payment-service:latest
+
+docker run -d -p 3000:3000 <dockerhub-username>/frontend-service:latest
+docker run -d -p 3001:3001 <dockerhub-username>/user-service:latest
+docker run -d -p 3002:3002 <dockerhub-username>/product-service:latest
+docker run -d -p 3003:3003 <dockerhub-username>/order-service:latest
+docker run -d -p 3004:3004 <dockerhub-username>/payment-service:latest
+```
+
+---
+
+## 3. Deployment and Accessibility (25 Marks)
+
+### Frontend Accessibility
+
+The frontend service is deployed and publicly accessible using the EC2 Public IP.
+
+Frontend URL:
+
+```text
+http://<EC2-Public-IP>:3000
+```
+
+Expected Response:
+
+```text
+Frontend is Live
+```
+
+### Backend Service Verification
+
+Backend services were verified by:
+
+- Inspecting running Docker containers.
+- Accessing service endpoints.
+- Viewing Docker container logs.
+
+Verification Commands:
+
+```bash
+docker ps
+```
+
+```bash
+docker logs <container-id>
+```
+
+Example Service Endpoints:
+
+```text
+http://<EC2-Public-IP>:3001
+http://<EC2-Public-IP>:3002
+http://<EC2-Public-IP>:3003
+http://<EC2-Public-IP>:3004
+```
+
+### Terraform Outputs
+
+Terraform outputs were configured to display the application access details.
+
+Example:
+
+```hcl
+output "instance_public_ip" {
+  value = aws_instance.app_server.public_ip
+}
+```
+
+Sample Output:
+
+```text
+instance_public_ip = xx.xx.xx.xx
+```
+
+Application Access:
+
+```text
+http://xx.xx.xx.xx:3000
+```
+
+---
+
+## Project Deliverables
+
+- ✅ Five containerized Node.js services
+- ✅ Dockerfiles for all services
+- ✅ Docker images pushed to Docker Hub
+- ✅ Terraform code for AWS infrastructure
+- ✅ Custom VPC and Public Subnet
+- ✅ EC2 Instance with Docker installed automatically
+- ✅ Automated container deployment using User Data
+- ✅ Frontend service publicly accessible
+- ✅ Backend services verified
+- ✅ Terraform outputs displaying public IP
+
+---
+
+## Conclusion
+
+Successfully deployed a multi-service Node.js e-commerce application using Docker and Terraform on AWS. The infrastructure, networking, Docker installation, image deployment, and service accessibility were fully automated through Terraform and EC2 User Data scripts, ensuring a reproducible and scalable deployment process.
