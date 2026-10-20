@@ -29,6 +29,22 @@ Each service:
 - Exposes a dedicated port.
 - Returns a sample response confirming the service status.
 
+```
+E-CommerceStore/
+├── backend/
+│   ├── cart-service/
+│   │   └── Dockerfile
+│   ├── order-service/
+│   │   └── Dockerfile
+│   ├── product-service/
+│   │   └── Dockerfile
+│   └── user-service/
+│       └── Dockerfile
+└── frontend/
+│   └── Dockerfile
+├── docker-compose.yml
+```
+
 Example Response:
 
 ```text
