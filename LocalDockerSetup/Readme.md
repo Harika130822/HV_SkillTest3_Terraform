@@ -12,14 +12,12 @@ docker-compose -up
  ✔ Image ecomm-cart-service:latest    Built                                                                                                                                24.8s
  ✔ Image ecomm-product-service:latest Built                                                                                                                                24.8s
  ✔ Network ecommerce-network          Created                                                                                                                              0.1s
- ✔ Container mongo                    Created                                                                                                                              3.2s
  ✔ Container ecommorder-service       Created                                                                                                                              0.4s
  ✔ Container ecommproduct-service     Created                                                                                                                              0.4s
  ✔ Container ecommcart-service        Created                                                                                                                              0.4s
  ✔ Container ecommuser-service        Created                                                                                                                              0.3s
  ✔ Container ecommfrontend            Created                                                                                                                              0.1s
- ✔ Container nginx                    Created
-
+ 
 
 PS C:\Users\abhis\Harika\skilltest\E-CommerceStore> docker images
                                                                                                                                            i Info →   U  In Use
@@ -38,13 +36,11 @@ nginx:alpine                                                                    
 nginx:latest@sha256:5a88c9c45479443d7be2eadc894b4ed0a9801bae03d97a5760ae13b5c2005942   5a88c9c45479       63.1MB         63.1MB        
 PS C:\Users\abhis\Harika\skilltest\E-CommerceStore> docker ps
 CONTAINER ID   IMAGE                          COMMAND                  CREATED              STATUS                        PORTS                                             NAMES
-4923cf23450c   nginx:alpine                   "/docker-entrypoint.…"   About a minute ago   Up About a minute             0.0.0.0:80->80/tcp, [::]:80->80/tcp               nginx
 13fdb8ad483c   ecomm-frontend:latest          "docker-entrypoint.s…"   About a minute ago   Up About a minute             0.0.0.0:3000->3000/tcp, [::]:3000->3000/tcp       ecommfrontend
 9f1468e56afb   ecomm-cart-service:latest      "docker-entrypoint.s…"   About a minute ago   Up About a minute             0.0.0.0:3003->3003/tcp, [::]:3003->3003/tcp       ecommcart-service
 4833f0cf9699   ecomm-product-service:latest   "docker-entrypoint.s…"   About a minute ago   Up About a minute             0.0.0.0:3002->3002/tcp, [::]:3002->3002/tcp       ecommproduct-service
 48e0f3ab2d37   ecomm-user-service:latest      "docker-entrypoint.s…"   About a minute ago   Up About a minute             0.0.0.0:3001->3001/tcp, [::]:3001->3001/tcp       ecommuser-service
 c2221f47e904   ecomm-order-service:latest     "docker-entrypoint.s…"   About a minute ago   Up About a minute             0.0.0.0:3004->3004/tcp, [::]:3004->3004/tcp       ecommorder-service
-2c7ac91f9745   mongo:6                        "docker-entrypoint.s…"   About a minute ago   Up About a minute (healthy)   0.0.0.0:27017->27017/tcp, [::]:27017->27017/tcp   mongo
 PS C:\Users\abhis\Harika\skilltest\E-CommerceStore> 
 ```
 > <img width="1378" height="929" alt="image" src="https://github.com/user-attachments/assets/aa5ac263-775c-490c-bbeb-b7f13244d5af" />
