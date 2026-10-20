@@ -1,10 +1,12 @@
 ## Terraform commands
 
-
 ```
 # pre-requisites
 aws configure
 aws sts get-caller-identity
+cd terraform
+ssh-keygen -t rsa -b 4096 -f my-key
+
 
 
 PS C:\Users\abhis\Harika\skilltest\E-CommerceStore\terraform> terraform init
