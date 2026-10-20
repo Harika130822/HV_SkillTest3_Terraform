@@ -1,0 +1,288 @@
+---orders
+
+use("ecommerce");
+
+const user = db.users.findOne({ isActive: { $ne: false } });
+const products = db.products.find({ isActive: { $ne: false } }).limit(3).toArray();
+
+if (!user) throw new Error("Create a user before inserting sample orders.");
+if (!products.length) throw new Error("Insert products before inserting sample orders.");
+
+const productAt = (index) => products[index % products.length];
+
+const makeItem = (product, quantity) => ({
+  productId: product._id,
+  quantity,
+  price: product.price,
+  total: Number((product.price * quantity).toFixed(2)),
+  productDetails: {
+    name: product.name,
+    sku: product.inventory.sku,
+    image: product.images?.[0]?.url || ""
+  }
+});
+
+const address = {
+  firstName: "Alex",
+  lastName: "Morgan",
+  street: "123 Market Street",
+  city: "San Francisco",
+  state: "California",
+  zipCode: "94105",
+  country: "USA",
+  phone: "555-0100"
+};
+
+const makeOrder = (number, items, status, paymentStatus, paymentMethod, shippingMethod) => {
+  const subtotal = Number(items.reduce((sum, item) => sum + item.total, 0).toFixed(2));
+  const tax = Number((subtotal * 0.08).toFixed(2));
+  const shippingCost = 5.99;
+
+  return {
+    orderNumber: `ORD-SAMPLE-${Date.now()}-${number}`,
+    userId: user._id,
+    items,
+    pricing: {
+      subtotal,
+      tax,
+      shipping: shippingCost,
+      discount: 0,
+      total: Number((subtotal + tax + shippingCost).toFixed(2))
+    },
+    shippingAddress: address,
+    billingAddress: address,
+    status,
+    paymentStatus,
+    paymentMethod,
+    paymentDetails: paymentStatus === "paid"
+      ? {
+          transactionId: `TXN-SAMPLE-${number}`,
+          paymentGateway: paymentMethod,
+          paidAt: new Date()
+        }
+      : {},
+    shipping: {
+      method: shippingMethod,
+      carrier: status === "shipped" || status === "delivered" ? "Sample Express" : undefined,
+      trackingNumber: status === "shipped" || status === "delivered"
+        ? `TRACK-SAMPLE-${number}`
+        : undefined,
+      estimatedDelivery: new Date(Date.now() + 5 * 24 * 60 * 60 * 1000)
+    },
+    customerNotes: "Sample order for testing",
+    createdAt: new Date(),
+    updatedAt: new Date()
+  };
+};
+
+const result = db.orders.insertMany([
+  makeOrder(
+    1,
+    [makeItem(productAt(0), 1), makeItem(productAt(1), 2)],
+    "shipped",
+    "paid",
+    "credit_card",
+    "standard"
+  ),
+  makeOrder(
+    2,
+    [makeItem(productAt(1), 1)],
+    "processing",
+    "pending",
+    "cash_on_delivery",
+    "express"
+  ),
+  makeOrder(
+    3,
+    [makeItem(productAt(2), 2)],
+    "delivered",
+    "paid",
+    "paypal",
+    "standard"
+  )
+]);
+
+printjson(result);
+
+---
+
+use("ecommerce");
+
+const categoryData = [
+  { name: "Electronics", slug: "electronics", description: "Electronic devices and accessories" },
+  { name: "Clothing", slug: "clothing", description: "Clothing and apparel" },
+  { name: "Home & Kitchen", slug: "home-kitchen", description: "Home and kitchen essentials" },
+  { name: "Sports", slug: "sports", description: "Sports and fitness equipment" },
+  { name: "Books", slug: "books", description: "Books and reading material" }
+];
+
+for (const category of categoryData) {
+  db.categories.updateOne(
+    { slug: category.slug },
+    {
+      $setOnInsert: {
+        ...category,
+        isActive: true,
+        createdAt: new Date(),
+        updatedAt: new Date()
+      }
+    },
+    { upsert: true }
+  );
+}
+
+const categoryId = (slug) => db.categories.findOne({ slug })._id;
+
+db.products.insertMany([
+  {
+    name: "Wireless Bluetooth Headphones",
+    description: "Over-ear headphones with wireless connectivity and a built-in microphone.",
+    price: 79.99,
+    category: categoryId("electronics"),
+    brand: "SoundWave",
+    images: [{ url: "https://placehold.co/600x400?text=Headphones", alt: "Wireless headphones" }],
+    inventory: { stock: 45, sku: "ELEC-HEAD-001", lowStockThreshold: 10 },
+    specifications: { weight: 0.28, color: "Black", material: "Plastic" },
+    ratings: { average: 4.5, count: 128 },
+    tags: ["audio", "wireless", "headphones"],
+    isActive: true,
+    featured: true
+  },
+  {
+    name: "Portable Bluetooth Speaker",
+    description: "Compact portable speaker with Bluetooth connectivity.",
+    price: 49.99,
+    category: categoryId("electronics"),
+    brand: "SoundWave",
+    images: [{ url: "https://placehold.co/600x400?text=Speaker", alt: "Portable speaker" }],
+    inventory: { stock: 32, sku: "ELEC-SPKR-002", lowStockThreshold: 8 },
+    specifications: { weight: 0.45, color: "Blue", material: "Plastic" },
+    ratings: { average: 4.3, count: 76 },
+    tags: ["audio", "bluetooth", "portable"],
+    isActive: true,
+    featured: false
+  },
+  {
+    name: "Classic Cotton T-Shirt",
+    description: "Everyday cotton T-shirt with a comfortable regular fit.",
+    price: 19.99,
+    category: categoryId("clothing"),
+    brand: "Everyday",
+    images: [{ url: "https://placehold.co/600x400?text=T-Shirt", alt: "Cotton T-shirt" }],
+    inventory: { stock: 100, sku: "CLO-TSHIRT-003", lowStockThreshold: 15 },
+    specifications: { color: "White", material: "Cotton" },
+    ratings: { average: 4.2, count: 54 },
+    tags: ["clothing", "cotton", "casual"],
+    isActive: true,
+    featured: false
+  },
+  {
+    name: "Lightweight Running Jacket",
+    description: "Lightweight zip-up jacket for running and outdoor workouts.",
+    price: 64.5,
+    category: categoryId("clothing"),
+    brand: "TrailFit",
+    images: [{ url: "https://placehold.co/600x400?text=Running+Jacket", alt: "Running jacket" }],
+    inventory: { stock: 28, sku: "CLO-JACKET-004", lowStockThreshold: 8 },
+    specifications: { weight: 0.4, color: "Navy", material: "Polyester" },
+    ratings: { average: 4.6, count: 39 },
+    tags: ["clothing", "running", "outerwear"],
+    isActive: true,
+    featured: true
+  },
+  {
+    name: "Stainless Steel Water Bottle",
+    description: "Reusable insulated bottle for hot and cold drinks.",
+    price: 24.95,
+    category: categoryId("home-kitchen"),
+    brand: "DailyUse",
+    images: [{ url: "https://placehold.co/600x400?text=Water+Bottle", alt: "Steel water bottle" }],
+    inventory: { stock: 60, sku: "HOME-BOTTLE-005", lowStockThreshold: 12 },
+    specifications: { weight: 0.35, color: "Silver", material: "Stainless steel" },
+    ratings: { average: 4.7, count: 91 },
+    tags: ["kitchen", "reusable", "drinkware"],
+    isActive: true,
+    featured: false
+  },
+  {
+    name: "Ceramic Coffee Mug Set",
+    description: "Set of two ceramic mugs for coffee, tea, and other hot drinks.",
+    price: 29.99,
+    category: categoryId("home-kitchen"),
+    brand: "Hearth & Home",
+    images: [{ url: "https://placehold.co/600x400?text=Coffee+Mugs", alt: "Ceramic coffee mugs" }],
+    inventory: { stock: 22, sku: "HOME-MUG-006", lowStockThreshold: 6 },
+    specifications: { weight: 0.7, color: "Cream", material: "Ceramic" },
+    ratings: { average: 4.4, count: 33 },
+    tags: ["kitchen", "ceramic", "drinkware"],
+    isActive: true,
+    featured: false
+  },
+  {
+    name: "Adjustable Yoga Mat",
+    description: "Non-slip exercise mat suitable for yoga and floor workouts.",
+    price: 34.99,
+    category: categoryId("sports"),
+    brand: "FlexMove",
+    images: [{ url: "https://placehold.co/600x400?text=Yoga+Mat", alt: "Exercise yoga mat" }],
+    inventory: { stock: 40, sku: "SPRT-YOGA-007", lowStockThreshold: 10 },
+    specifications: { weight: 1.1, color: "Purple", material: "Foam" },
+    ratings: { average: 4.5, count: 67 },
+    tags: ["fitness", "yoga", "exercise"],
+    isActive: true,
+    featured: true
+  },
+  {
+    name: "Insulated Running Bottle",
+    description: "Lightweight squeeze bottle designed for workouts and runs.",
+    price: 14.99,
+    category: categoryId("sports"),
+    brand: "TrailFit",
+    images: [{ url: "https://placehold.co/600x400?text=Running+Bottle", alt: "Sports water bottle" }],
+    inventory: { stock: 75, sku: "SPRT-BOTTLE-008", lowStockThreshold: 12 },
+    specifications: { weight: 0.18, color: "Red", material: "Plastic" },
+    ratings: { average: 4.1, count: 42 },
+    tags: ["fitness", "running", "hydration"],
+    isActive: true,
+    featured: false
+  },
+  {
+    name: "The Art of Simple Living",
+    description: "A practical guide to building calmer and more organized daily habits.",
+    price: 18.5,
+    category: categoryId("books"),
+    brand: "Northstar Press",
+    images: [{ url: "https://placehold.co/600x400?text=Simple+Living", alt: "Simple living book" }],
+    inventory: { stock: 18, sku: "BOOK-LIVING-009", lowStockThreshold: 5 },
+    specifications: { weight: 0.32, material: "Paperback" },
+    ratings: { average: 4.3, count: 25 },
+    tags: ["book", "lifestyle", "wellness"],
+    isActive: true,
+    featured: false
+  },
+  {
+    name: "Introduction to Web Development",
+    description: "Beginner-friendly introduction to HTML, CSS, and JavaScript concepts.",
+    price: 32,
+    category: categoryId("books"),
+    brand: "CodePath Books",
+    images: [{ url: "https://placehold.co/600x400?text=Web+Development", alt: "Web development book" }],
+    inventory: { stock: 14, sku: "BOOK-WEBDEV-010", lowStockThreshold: 5 },
+    specifications: { weight: 0.55, material: "Paperback" },
+    ratings: { average: 4.8, count: 112 },
+    tags: ["book", "programming", "web-development"],
+    isActive: true,
+    featured: true
+  }
+]);
+
+
+---
+
+db.products.find({}, { name: 1, price: 1, "inventory.sku": 1 }).pretty();
+
+---
+
+db.orders.find({}, { orderNumber: 1, status: 1, paymentStatus: 1, "pricing.total": 1 }).pretty();
+
+---
