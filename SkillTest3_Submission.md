@@ -12,11 +12,11 @@ Create, containerize, and publish five independent services using Docker.
 
 | Service Name | Port |
 |-------------|------|
-| Frontend Service | 3000 |
+| Frontend | 3000 |
 | User Service | 3001 |
 | Product Service | 3002 |
 | Order Service | 3003 |
-| Payment Service | 3004 |
+| Cart Service | 3004 |
 
 ### Tasks Performed
 
@@ -32,11 +32,11 @@ Each service:
 Example Response:
 
 ```text
-Frontend Service Running
+Frontend Running
 User Service Running
 Product Service Running
 Order Service Running
-Payment Service Running
+Cart Service Running
 ```
 
 #### Step 2: Build Docker Images
@@ -44,11 +44,11 @@ Payment Service Running
 Commands used:
 
 ```bash
-docker build -t frontend-service .
-docker build -t user-service .
-docker build -t product-service .
-docker build -t order-service .
-docker build -t payment-service .
+docker build -t ecomm-frontend .
+docker build -t ecomm-user-service .
+docker build -t ecomm-product-service .
+docker build -t ecomm-order-service .
+docker build -t ecomm-cart-service .
 ```
 
 #### Step 3: Test Docker Images Locally
@@ -56,11 +56,11 @@ docker build -t payment-service .
 Example:
 
 ```bash
-docker run -d -p 3000:3000 frontend-service
-docker run -d -p 3001:3001 user-service
-docker run -d -p 3002:3002 product-service
-docker run -d -p 3003:3003 order-service
-docker run -d -p 3004:3004 payment-service
+docker run -d -p 3000:3000 ecomm-frontend
+docker run -d -p 3001:3001 ecomm-user-service
+docker run -d -p 3002:3002 ecomm-product-service
+docker run -d -p 3003:3003 ecomm-order-service
+docker run -d -p 3004:3004 ecomm-cart-service
 ```
 
 > <img width="1269" height="457" alt="image" src="https://github.com/user-attachments/assets/80428202-8cc7-453a-82a6-32ff8947382a" />
@@ -78,11 +78,11 @@ curl http://localhost:3004
 #### Step 4: Tag Docker Images
 
 ```bash
-docker tag frontend-service <dockerhub-username>/frontend-service:latest
-docker tag user-service <dockerhub-username>/user-service:latest
-docker tag product-service <dockerhub-username>/product-service:latest
-docker tag order-service <dockerhub-username>/order-service:latest
-docker tag payment-service <dockerhub-username>/payment-service:latest
+docker tag ecomm-frontend <dockerhub-username>/ecomm-frontend:latest
+docker tag ecomm-user-service <dockerhub-username>/ecomm-user-service:latest
+docker tag ecomm-product-service <dockerhub-username>/ecomm-product-service:latest
+docker tag ecomm-order-service <dockerhub-username>/ecomm-order-service:latest
+docker tag ecomm-cart-service <dockerhub-username>/ecomm-cart-service:latest
 ```
 
 > <img width="1305" height="191" alt="image" src="https://github.com/user-attachments/assets/eaf4f832-abf4-4355-8e24-910f8c16ef1b" />
@@ -91,11 +91,11 @@ docker tag payment-service <dockerhub-username>/payment-service:latest
 #### Step 5: Push Images to Docker Hub
 
 ```bash
-docker push <dockerhub-username>/frontend-service:latest
-docker push <dockerhub-username>/user-service:latest
-docker push <dockerhub-username>/product-service:latest
-docker push <dockerhub-username>/order-service:latest
-docker push <dockerhub-username>/payment-service:latest
+docker push <dockerhub-username>/ecomm-frontend:latest
+docker push <dockerhub-username>/ecomm-user-service:latest
+docker push <dockerhub-username>/ecomm-product-service:latest
+docker push <dockerhub-username>/ecomm-order-service:latest
+docker push <dockerhub-username>/ecomm-cart-service:latest
 ```
 
 ### Reference link with detailed steps
